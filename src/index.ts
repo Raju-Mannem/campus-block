@@ -18,7 +18,6 @@ import sectionRoutes from "./routes/sectionRoutes";
 import userRoutes from "./routes/userRoutes";
 import mediaRoutes from "./routes/mediaRoutes";
 
-/* CONFIGURATIONS */
 dotenv.config();
 const isProduction = process.env.NODE_ENV === "production";
 let dbConnectionPromise: Promise<Connection>;
