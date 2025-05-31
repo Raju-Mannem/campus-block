@@ -4,7 +4,7 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
-import serverless from "serverless-http";
+import serverlessExpress from "@vendia/serverless-express";
 import mongoose, { Connection } from 'mongoose';
 import { connectDB } from "./config/db";
 import { errorHandler } from "./middleware/errorHandler";
@@ -63,7 +63,7 @@ if (!isProduction) {
 }
 
 // aws production environment
-const serverlessApp = serverless(app);
+const serverlessApp = serverlessExpress({app});
 export const handler = async (event: any, context: any) => {
   if (!dbConnectionPromise) {
     dbConnectionPromise = connectDB();

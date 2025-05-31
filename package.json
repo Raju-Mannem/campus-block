@@ -38,6 +38,7 @@
     "@types/fluent-ffmpeg": "^2.1.27",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/multer": "^1.4.12",
+    "@vendia/serverless-express": "^4.12.6",
     "bcryptjs": "^3.0.2",
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
@@ -54,7 +55,6 @@
     "next-auth": "^4.24.11",
     "pluralize": "^8.0.0",
     "razorpay": "^2.9.6",
-    "serverless-http": "^3.2.0",
     "uuid": "^11.1.0",
     "zod": "^3.24.2"
   }
