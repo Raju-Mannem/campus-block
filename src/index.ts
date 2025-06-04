@@ -61,7 +61,6 @@ if (!isProduction) {
 });
 }
 
-// aws production environment
 const serverlessApp = serverlessExpress({app});
 export const handler = async (event: any, context: any) => {
   if (!dbConnectionPromise) {
