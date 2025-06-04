@@ -1,11 +1,11 @@
-import express, { Request, Response, NextFunction } from "express";
+import express, { Request, Response } from "express";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import serverlessExpress from "@vendia/serverless-express";
-import mongoose, { Connection } from 'mongoose';
+import { Connection } from 'mongoose';
 import { connectDB } from "./config/db";
 import { errorHandler } from "./middleware/errorHandler";
 import courseRoutes from "./routes/courseRoutes";
