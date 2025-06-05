@@ -28,6 +28,10 @@ Resources:
           Properties:
             Path: /{proxy+}
             Method: ANY
+Outputs:
+  HttpApiUrl:
+    Description: "API Gateway URL"
+    Value: !Sub "https://${MyHttpApi}.execute-api.${AWS::Region}.amazonaws.com"
 
 Parameters:
   MongoDbUri:
