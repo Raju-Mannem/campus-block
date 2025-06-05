@@ -1,37 +1,10 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Express API on Lambda via @vendia/serverless-express
+Description: Express API on Lambda via @vendia/serverless-express using HttpApi
 
 Globals:
   Function:
     Timeout: 30
-
-Resources:
-  ExpressApi:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: dist/index.handler
-      Runtime: nodejs20.x
-      CodeUri: .
-      MemorySize: 512
-      Environment:
-        Variables:
-          NODE_ENV: production
-          MONGODB_URI: !Ref MongoDbUri
-          S3_BUCKET_NAME: !Ref S3BucketName
-          CLOUDFRONT_DOMAIN: !Ref CloudFrontDomain
-          RAZORPAY_KEY_ID: !Ref RazorpayKeyId
-          RAZORPAY_KEY_SECRET: !Ref RazorpayKeySecret
-      Events:
-        Api:
-          Type: Api
-          Properties:
-            Path: /{proxy+}
-            Method: ANY
-Outputs:
-  HttpApiUrl:
-    Description: "API Gateway URL"
-    Value: !Sub "https://${MyHttpApi}.execute-api.${AWS::Region}.amazonaws.com"
 
 Parameters:
   MongoDbUri:
@@ -49,3 +22,37 @@ Parameters:
   RazorpayKeySecret:
     Type: String
     Description: Razorpay Key Secret
+
+Resources:
+  ExpressHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Name: ExpressHttpApi
+
+  ExpressApi:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/index.handler
+      Runtime: nodejs20.x
+      CodeUri: .
+      MemorySize: 512
+      Environment:
+        Variables:
+          NODE_ENV: production
+          MONGODB_URI: !Ref MongoDbUri
+          S3_BUCKET_NAME: !Ref S3BucketName
+          CLOUDFRONT_DOMAIN: !Ref CloudFrontDomain
+          RAZORPAY_KEY_ID: !Ref RazorpayKeyId
+          RAZORPAY_KEY_SECRET: !Ref RazorpayKeySecret
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref ExpressHttpApi
+            Path: /{proxy+}
+            Method: ANY
+
+Outputs:
+  HttpApiUrl:
+    Description: "HTTP API endpoint"
+    Value: !Sub "https://${ExpressHttpApi}.execute-api.${AWS::Region}.amazonaws.com"
