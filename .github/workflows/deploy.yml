@@ -55,5 +55,5 @@ jobs:
               S3BucketName=${{ secrets.S3_BUCKET_NAME }} \
               CloudFrontDomain=${{ secrets.CLOUDFRONT_DOMAIN }} \
               RazorpayKeyId=${{ secrets.RAZORPAY_KEY_ID }} \
-              RazorpayKeySecret=${{ secrets.RAZORPAY_KEY_SECRET }}
+              RazorpayKeySecret=${{ secrets.RAZORPAY_KEY_SECRET }} \
             --debug
