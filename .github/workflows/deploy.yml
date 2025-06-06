@@ -51,5 +51,5 @@ jobs:
               MongoDbUri=${{ secrets.MONGODB_URI }} \
               S3BucketName=${{ secrets.S3_BUCKET_NAME }} \
               CloudFrontDomain=${{ secrets.CLOUDFRONT_DOMAIN }} \
-              RazorpayKeyId=${{ secrets.Razorpay_Key_Id }} \
-              RazorpayKeySecret=${{ secrets.Razorpay_Key_Secret }}
+              RazorpayKeyId=${{ secrets.RAZORPAY_KEY_ID }} \
+              RazorpayKeySecret=${{ secrets.RAZORPAY_KEY_SECRET }}
