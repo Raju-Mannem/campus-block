@@ -18,9 +18,11 @@ Parameters:
     Description: CloudFront domain
   RazorpayKeyId:
     Type: String
+    Default: "dummy"
     Description: Razorpay Key Id
   RazorpayKeySecret:
     Type: String
+    Default: "dummy"
     Description: Razorpay Key Secret
 
 Resources:
