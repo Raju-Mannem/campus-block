@@ -44,7 +44,7 @@ jobs:
 
       - name: SAM Deploy (Debug)
         run: |
-          sam deploy \
+          sam deploy --debug \
             --no-confirm-changeset \
             --no-fail-on-empty-changeset \
             --stack-name my-express-api \
@@ -55,5 +55,4 @@ jobs:
               S3BucketName=${{ secrets.S3_BUCKET_NAME }} \
               CloudFrontDomain=${{ secrets.CLOUDFRONT_DOMAIN }} \
               RazorpayKeyId=${{ secrets.RAZORPAY_KEY_ID }} \
-              RazorpayKeySecret=${{ secrets.RAZORPAY_KEY_SECRET }} \
-            --debug
+              RazorpayKeySecret=${{ secrets.RAZORPAY_KEY_SECRET }}
