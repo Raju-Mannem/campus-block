@@ -7,6 +7,9 @@ Globals:
     Timeout: 30
 
 Parameters:
+  AWSRegion:
+    Type: String
+    Description: AWS Region
   MongoDbUri:
     Type: String
     Description: MongoDB connection string
@@ -41,6 +44,7 @@ Resources:
       Environment:
         Variables:
           NODE_ENV: production
+          AWS_REGION: !Ref AWSRegion
           MONGODB_URI: !Ref MongoDbUri
           S3_BUCKET_NAME: !Ref S3BucketName
           CLOUDFRONT_DOMAIN: !Ref CloudFrontDomain
