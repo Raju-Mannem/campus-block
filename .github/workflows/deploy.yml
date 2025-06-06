@@ -41,8 +41,8 @@ jobs:
 
       - name: Verify AWS Identity
         run: aws sts get-caller-identity
-        
-      - name: SAM Deploy
+
+      - name: SAM Deploy (Debug)
         run: |
           sam deploy \
             --no-confirm-changeset \
