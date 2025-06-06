@@ -39,6 +39,9 @@ jobs:
       - name: SAM Build
         run: sam build
 
+      - name: Verify AWS Identity
+        run: aws sts get-caller-identity
+        
       - name: SAM Deploy
         run: |
           sam deploy \
@@ -53,3 +56,4 @@ jobs:
               CloudFrontDomain=${{ secrets.CLOUDFRONT_DOMAIN }} \
               RazorpayKeyId=${{ secrets.RAZORPAY_KEY_ID }} \
               RazorpayKeySecret=${{ secrets.RAZORPAY_KEY_SECRET }}
+            --debug
