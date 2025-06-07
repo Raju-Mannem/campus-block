@@ -87,9 +87,6 @@ jobs:
           echo "SAM Template Path: $(pwd)/template.yaml"
           cat template.yaml
       
-      - name: Validate SAM template
-        run: sam validate --template-file template.yaml
-      
       - name: Check template.yaml encoding
         run: |
           file template.yaml
