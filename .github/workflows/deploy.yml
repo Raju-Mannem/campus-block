@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Clean .aws-sam directory
@@ -39,6 +39,9 @@ jobs:
 
       - name: Set up AWS SAM CLI
         uses: aws-actions/setup-sam@v2
+
+      - name: Downgrade SAM CLI
+        run: pip install --force-reinstall aws-sam-cli==1.110.0
 
       - name: Check SAM CLI Version
         run: sam --version
