@@ -63,9 +63,9 @@ jobs:
         run: ls -l .aws-sam/build
         working-directory: ${{ github.workspace }}
 
-      - name: SAM Sync (Debug)
+      - name: SAM Deploy (Guided)
         run: |
-          sam sync --debug \
+          yes "" | sam deploy --guided \
             --stack-name my-express-api \
             --capabilities CAPABILITY_IAM \
             --region ${{ secrets.AWS_REGION }} \
