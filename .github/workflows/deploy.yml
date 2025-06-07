@@ -18,7 +18,7 @@ jobs:
         working-directory: ${{ github.workspace }}
 
       - name: Clean docker images
-        docker system prune -af
+        run: docker system prune -af
 
       - name: Print working directory
         run: pwd
