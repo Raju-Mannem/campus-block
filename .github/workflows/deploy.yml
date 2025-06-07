@@ -46,6 +46,11 @@ jobs:
         run: terraform init
         working-directory: terraform
 
+      - name: Import lambda role into Terraform state
+        run: terraform import aws_iam_role.lambda_exec lambda_exec_role
+             terraform plan
+             terraform apply
+
       - name: Terraform Apply
         env:
           AWS_REGION: ${{ secrets.AWS_REGION }}
