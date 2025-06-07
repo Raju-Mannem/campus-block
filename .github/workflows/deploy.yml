@@ -63,8 +63,16 @@ jobs:
         run: ls -l .aws-sam/build
         working-directory: ${{ github.workspace }}
 
+      - name: List files
+        run: ls -l
+
       - name: Check AWS Identity
         run: aws sts get-caller-identity
+
+      - name: Print SAM Template Path and Contents
+        run: |
+          echo "SAM Template Path: $(pwd)/template.yaml"
+          cat template.yaml
 
       - name: SAM Deploy (Debug)
         run: |
@@ -72,6 +80,7 @@ jobs:
             --stack-name my-express-api \
             --capabilities CAPABILITY_IAM \
             --region ${{ secrets.AWS_REGION }} \
+            --s3-bucket ${{ secrets.SAM_ARTIFACT_BUCKET }} \
             --parameter-overrides \
               MongoDbUri=${{ secrets.MONGODB_URI }} \
               S3BucketName=${{ secrets.S3_BUCKET_NAME }} \
