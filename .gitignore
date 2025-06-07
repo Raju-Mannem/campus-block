@@ -14,6 +14,7 @@ Thumbs.db
 
 .vscode/
 .aws-sam
+samconfig.toml
 
 server/shared-local-instance.db
 server/dynamodb-local-metadata.json

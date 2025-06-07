@@ -44,7 +44,7 @@ Resources:
       Environment:
         Variables:
           NODE_ENV: production
-          AWS_REGION: !Ref AWSRegion
+          REGION: !Ref AWSRegion
           MONGODB_URI: !Ref MongoDbUri
           S3_BUCKET_NAME: !Ref S3BucketName
           CLOUDFRONT_DOMAIN: !Ref CloudFrontDomain

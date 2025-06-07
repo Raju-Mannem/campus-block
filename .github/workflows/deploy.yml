@@ -39,6 +39,9 @@ jobs:
       - name: SAM Build
         run: sam build
 
+      - name: Show built template
+        run: cat .aws-sam/build/template.yaml
+
       - name: Verify AWS Identity
         run: aws sts get-caller-identity
 
