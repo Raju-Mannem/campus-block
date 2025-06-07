@@ -33,7 +33,6 @@ app.use(cors({
   credentials: true
 }));
 
-/* ROUTES */
 app.get("/", (req, res) => {
   res.send("Hello World");
 });
