@@ -70,8 +70,3 @@ resource "aws_lambda_permission" "apigw" {
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_api.api.execution_arn}/*/*"
 }
-
-output "api_endpoint" {
-  description = "API Gateway endpoint"
-  value       = aws_apigatewayv2_stage.api.invoke_url
-}
