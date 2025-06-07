@@ -10,12 +10,15 @@ permissions:
 
 jobs:
   deploy:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Clean .aws-sam directory
         run: rm -rf .aws-sam
         working-directory: ${{ github.workspace }}
+
+      - name: Clean docker images
+        docker system prune -af
 
       - name: Print working directory
         run: pwd
@@ -39,9 +42,6 @@ jobs:
 
       - name: Set up AWS SAM CLI
         uses: aws-actions/setup-sam@v2
-
-      - name: Uninstall existing SAM CLI
-        run: pip uninstall -y aws-sam-cli || true
 
       - name: Install specific SAM CLI version
         run: pip install aws-sam-cli==1.110.0
@@ -92,23 +92,21 @@ jobs:
         run: |
           echo "SAM Template Path: $(pwd)/template.yaml"
           cat -A template.yaml
-      
-      - name: Validate SAM template
-        run: sam validate --template-file template.yaml
-      
-      - name: Check template.yaml encoding
-        run: |
-          file template.yaml
-          hexdump -C template.yaml | head -20
 
-      - name: SAM Build and Deploy in Docker
+      - name: SAM Deploy (Debug)
         run: |
-          docker run --rm \
-            -v ${{ github.workspace }}:/app \
-            -w /app \
-            -e AWS_ACCESS_KEY_ID \
-            -e AWS_SECRET_ACCESS_KEY \
-            -e AWS_SESSION_TOKEN \
-            -e AWS_REGION \
-            amazon/aws-sam-cli:latest \
-            bash -c "sam build --debug && sam deploy --template-file template.yaml --stack-name my-express-api --capabilities CAPABILITY_IAM --s3-bucket ${{ secrets.SAM_ARTIFACT_BUCKET }} --region ${{ secrets.AWS_REGION }}"
+          sam deploy --debug \
+            --template-file template.yaml \
+            --no-confirm-changeset \
+            --no-fail-on-empty-changeset \
+            --stack-name my-express-api \
+            --capabilities CAPABILITY_IAM \
+            --s3-bucket ${{ secrets.SAM_ARTIFACT_BUCKET }} \
+            --region ${{ secrets.AWS_REGION }} \
+            --parameter-overrides \
+              MongoDbUri=${{ secrets.MONGODB_URI }} \
+              S3BucketName=${{ secrets.S3_BUCKET_NAME }} \
+              CloudFrontDomain=${{ secrets.CLOUDFRONT_DOMAIN }} \
+              RazorpayKeyId=${{ secrets.RAZORPAY_KEY_ID }} \
+              RazorpayKeySecret=${{ secrets.RAZORPAY_KEY_SECRET }}
+        working-directory: ${{ github.workspace }}
