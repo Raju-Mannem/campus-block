@@ -48,8 +48,8 @@ jobs:
 
       - name: Import lambda role into Terraform state
         run: terraform import aws_iam_role.lambda_exec lambda_exec_role
-             terraform plan
-             terraform apply
+        working-directory: terraform
+        continue-on-error: true
 
       - name: Terraform Apply
         env:
