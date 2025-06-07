@@ -13,6 +13,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Clean .aws-sam directory
+        run: rm -rf .aws-sam
+        working-directory: ${{ github.workspace }}
+
       - name: Print working directory
         run: pwd
       
@@ -77,10 +81,12 @@ jobs:
       - name: SAM Deploy (Debug)
         run: |
           sam deploy --debug \
+            --no-confirm-changeset \
+            --no-fail-on-empty-changeset \
             --stack-name my-express-api \
             --capabilities CAPABILITY_IAM \
-            --region ${{ secrets.AWS_REGION }} \
             --s3-bucket ${{ secrets.SAM_ARTIFACT_BUCKET }} \
+            --region ${{ secrets.AWS_REGION }} \
             --parameter-overrides \
               MongoDbUri=${{ secrets.MONGODB_URI }} \
               S3BucketName=${{ secrets.S3_BUCKET_NAME }} \
