@@ -73,6 +73,15 @@ jobs:
       - name: Check AWS Identity
         run: aws sts get-caller-identity
 
+      - name: Print samconfig.toml if it exists
+        run: |
+          if [ -f samconfig.toml ]; then
+            echo "samconfig.toml contents:"
+            cat samconfig.toml
+          else
+            echo "No samconfig.toml found."
+          fi
+
       - name: Print SAM Template Path and Contents
         run: |
           echo "SAM Template Path: $(pwd)/template.yaml"
