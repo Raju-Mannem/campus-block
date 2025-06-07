@@ -26,6 +26,8 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
 resource "aws_lambda_function" "main" {
   function_name = "my-lambda"
   handler       = "dist/index.handler"
+  s3_bucket        = var.lambda_s3_bucket
+  s3_key           = "lambda.zip"
   runtime       = "nodejs20.x"
   role          = aws_iam_role.lambda_exec_role.arn
   depends_on       = [aws_iam_role_policy_attachment.lambda_basic_execution]

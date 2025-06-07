@@ -3,6 +3,8 @@ name: Deploy Serverless App with Terraform
 on:
   push:
     branches: [master]
+    paths: [src/**, package.json, package-lock.json, terraform/**]
+    workflow_dispatch:
 
 permissions:
   id-token: write
@@ -11,6 +13,9 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .
 
     steps:
       - name: Clean workspace
@@ -24,15 +29,15 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install dependencies
-        run: npm install
+      - name: Install dependencies and build
+        run: npm ci --only=production && npx esbuild src/index.ts --bundle --platform=node --target=node20 --outfile=dist/index.js
 
-      - name: Build Lambda
-        run: npm run build
-
-      - name: Zip Lambda code
-        run: zip -r lambda.zip dist node_modules package.json
-
+      - name: Package Lambda
+        run: |
+          cd dist
+          zip -r ../lambda.zip index.js ../node_modules ../package.json
+          cd ..
+          
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v3
 
@@ -42,8 +47,15 @@ jobs:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github_actions
           aws-region: ${{ secrets.AWS_REGION }}
 
+      - name: Upload Lambda zip to S3
+        run: aws s3 cp lambda.zip s3://${{ secrets.LAMBDA_S3_BUCKET }}/lambda.zip
+
       - name: Terraform Init
         run: terraform init
+        working-directory: terraform
+
+      - name: Terraform Plan
+        run: terraform plan -input=false
         working-directory: terraform
 
       - name: Terraform Apply
