@@ -86,6 +86,18 @@ jobs:
         run: |
           echo "SAM Template Path: $(pwd)/template.yaml"
           cat template.yaml
+      
+      - name: Validate SAM template
+        run: sam validate --template-file template.yaml
+      
+      - name: Check template.yaml encoding
+        run: |
+          file template.yaml
+          hexdump -C template.yaml | head -20
+
+      - name: Parse YAML with Python
+        run: |
+          python3 -c "import yaml; print(yaml.safe_load(open('template.yaml')))"
 
       - name: SAM Deploy (Debug)
         run: |
