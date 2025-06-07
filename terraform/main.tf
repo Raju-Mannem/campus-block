@@ -25,7 +25,7 @@ resource "aws_lambda_function" "main" {
   runtime       = "nodejs20.x"
   role          = aws_iam_role.lambda_exec.arn
   filename      = "lambda.zip"
-  source_code_hash = filebase64sha256("lambda.zip")
+  source_code_hash = filebase64sha256("../lambda.zip")
   environment {
     variables = {
       MONGODB_URI         = var.mongodb_uri
