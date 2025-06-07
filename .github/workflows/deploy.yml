@@ -66,9 +66,9 @@ jobs:
       - name: Check AWS Identity
         run: aws sts get-caller-identity
 
-      - name: SAM Deploy
+      - name: SAM Deploy (Debug)
         run: |
-          sam deploy \
+          sam deploy --debug \
             --stack-name my-express-api \
             --capabilities CAPABILITY_IAM \
             --region ${{ secrets.AWS_REGION }} \
