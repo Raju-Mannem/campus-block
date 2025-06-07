@@ -37,6 +37,7 @@ jobs:
         uses: aws-actions/setup-sam@v2
         with:
            version: latest
+           use-installer: true
 
       - name: Check SAM CLI Version
         run: sam --version
