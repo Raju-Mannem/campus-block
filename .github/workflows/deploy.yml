@@ -110,5 +110,5 @@ jobs:
             -e AWS_SECRET_ACCESS_KEY \
             -e AWS_SESSION_TOKEN \
             -e AWS_REGION \
-            amazon/aws-sam-cli-build-image-nodejs20.x \
-            bash -c "sam build && sam deploy --template-file template.yaml --stack-name my-express-api --capabilities CAPABILITY_IAM --s3-bucket ${{ secrets.SAM_ARTIFACT_BUCKET }} --region ${{ secrets.AWS_REGION }}"
+            amazon/aws-sam-cli:latest \
+            bash -c "sam build --debug && sam deploy --template-file template.yaml --stack-name my-express-api --capabilities CAPABILITY_IAM --s3-bucket ${{ secrets.SAM_ARTIFACT_BUCKET }} --region ${{ secrets.AWS_REGION }}"
