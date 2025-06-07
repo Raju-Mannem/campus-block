@@ -1,16 +1,60 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
+Description: Express API on Lambda via @vendia/serverless-express using HttpApi
+
+Globals:
+  Function:
+    Timeout: 30
+
+Parameters:
+  MongoDbUri:
+    Type: String
+    Description: MongoDB connection string
+  S3BucketName:
+    Type: String
+    Description: S3 bucket name
+  CloudFrontDomain:
+    Type: String
+    Description: CloudFront domain
+  RazorpayKeyId:
+    Type: String
+    Default: "dummy"
+    Description: Razorpay Key Id
+  RazorpayKeySecret:
+    Type: String
+    Default: "dummy"
+    Description: Razorpay Key Secret
 
 Resources:
-  HelloWorldFunction:
+  ExpressHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Name: ExpressHttpApi
+
+  ExpressApi:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: index.handler
+      Handler: dist/index.handler
       Runtime: nodejs20.x
       CodeUri: .
+      MemorySize: 512
+      Environment:
+        Variables:
+          NODE_ENV: production
+          MONGODB_URI: !Ref MongoDbUri
+          S3_BUCKET_NAME: !Ref S3BucketName
+          CLOUDFRONT_DOMAIN: !Ref CloudFrontDomain
+          RAZORPAY_KEY_ID: !Ref RazorpayKeyId
+          RAZORPAY_KEY_SECRET: !Ref RazorpayKeySecret
       Events:
-        HelloWorld:
-          Type: Api
+        Api:
+          Type: HttpApi
           Properties:
-            Path: /hello
-            Method: get
+            ApiId: !Ref ExpressHttpApi
+            Path: /{proxy+}
+            Method: ANY
+
+Outputs:
+  HttpApiUrl:
+    Description: "HTTP API endpoint"
+    Value: !Sub "https://${ExpressHttpApi}.execute-api.${AWS::Region}.amazonaws.com"

@@ -1,4 +1,4 @@
-name: Deploy to AWS Lambda via SAM
+name: Deploy Serverless App with Terraform
 
 on:
   push:
@@ -13,16 +13,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Clean .aws-sam directory
-        run: rm -rf .aws-sam
-        working-directory: ${{ github.workspace }}
+      - name: Clean workspace
+        run: rm -rf .terraform terraform.tfstate* .terraform.lock.hcl .aws-sam node_modules dist lambda.zip
 
-      - name: Clean docker images
-        run: docker system prune -af
-
-      - name: Print working directory
-        run: pwd
-      
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -34,79 +27,34 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build TypeScript
+      - name: Build Lambda
         run: npm run build
 
-      - name: Clean pip cache
-        run: pip cache purge || true
+      - name: Zip Lambda code
+        run: cd dist && zip -r ../lambda.zip *
 
-      - name: Set up AWS SAM CLI
-        uses: aws-actions/setup-sam@v2
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
 
-      - name: Install specific SAM CLI version
-        run: pip install aws-sam-cli==1.110.0
-
-      - name: Check SAM CLI Version
-        run: sam --version
-
-      - name: Clean pip cache
-        run: pip cache purge || true
-
-      - name: Configure AWS credentials (OIDC)
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::864899850979:role/github_actions
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github_actions
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: SAM Build
-        run: sam build
-        working-directory: ${{ github.workspace }}
+      - name: Terraform Init
+        run: terraform init
 
-      - name: Show built template
-        run: cat .aws-sam/build/template.yaml
-        working-directory: ${{ github.workspace }}
+      - name: Terraform Apply
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          TF_VAR_aws_region: ${{ secrets.AWS_REGION }}
+          TF_VAR_mongodb_uri: ${{ secrets.MONGODB_URI }}
+          TF_VAR_s3_bucket_name: ${{ secrets.S3_BUCKET_NAME }}
+          TF_VAR_cloudfront_domain: ${{ secrets.CLOUDFRONT_DOMAIN }}
+          TF_VAR_razorpay_key_id: ${{ secrets.RAZORPAY_KEY_ID }}
+          TF_VAR_razorpay_key_secret: ${{ secrets.RAZORPAY_KEY_SECRET }}
+        run: terraform apply -auto-approve
 
-      - name: Verify AWS Identity
-        run: aws sts get-caller-identity
-
-      - name: List build directory
-        run: ls -l .aws-sam/build
-        working-directory: ${{ github.workspace }}
-
-      - name: List files
-        run: ls -l
-
-      - name: Check AWS Identity
-        run: aws sts get-caller-identity
-
-      - name: Print samconfig.toml if it exists
-        run: |
-          if [ -f samconfig.toml ]; then
-            echo "samconfig.toml contents:"
-            cat samconfig.toml
-          else
-            echo "No samconfig.toml found."
-          fi
-
-      - name: Print SAM Template Path and Contents
-        run: |
-          echo "SAM Template Path: $(pwd)/template.yaml"
-          cat -A template.yaml
-
-      - name: SAM Deploy (Debug)
-        run: |
-          sam deploy --debug \
-            --template-file template.yaml \
-            --no-confirm-changeset \
-            --no-fail-on-empty-changeset \
-            --stack-name my-express-api \
-            --capabilities CAPABILITY_IAM \
-            --s3-bucket ${{ secrets.SAM_ARTIFACT_BUCKET }} \
-            --region ${{ secrets.AWS_REGION }} \
-            --parameter-overrides \
-              MongoDbUri=${{ secrets.MONGODB_URI }} \
-              S3BucketName=${{ secrets.S3_BUCKET_NAME }} \
-              CloudFrontDomain=${{ secrets.CLOUDFRONT_DOMAIN }} \
-              RazorpayKeyId=${{ secrets.RAZORPAY_KEY_ID }} \
-              RazorpayKeySecret=${{ secrets.RAZORPAY_KEY_SECRET }}
-        working-directory: ${{ github.workspace }}
+      - name: Show API Endpoint
+        run: terraform output -raw api_endpoint || terraform output api_endpoint
