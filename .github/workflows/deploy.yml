@@ -95,9 +95,13 @@ jobs:
           file template.yaml
           hexdump -C template.yaml | head -20
 
-      - name: Parse YAML with Python
+      - name: Echo SAM Deploy Params
         run: |
-          pip install cfn-lint; cfn-lint template.yaml
+          echo "MongoDbUri=${{ secrets.MONGODB_URI }}"
+          echo "S3BucketName=${{ secrets.S3_BUCKET_NAME }}"
+          echo "CloudFrontDomain=${{ secrets.CLOUDFRONT_DOMAIN }}"
+          echo "RazorpayKeyId=${{ secrets.RAZORPAY_KEY_ID }}"
+          echo "RazorpayKeySecret=${{ secrets.RAZORPAY_KEY_SECRET }}"
 
       - name: SAM Deploy (Debug)
         run: |
