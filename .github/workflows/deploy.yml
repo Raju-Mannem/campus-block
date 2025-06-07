@@ -66,6 +66,7 @@ jobs:
       - name: SAM Deploy (Debug)
         run: |
           sam deploy --debug \
+            --template-file .aws-sam/build/template.yaml \
             --no-confirm-changeset \
             --no-fail-on-empty-changeset \
             --stack-name my-express-api \
