@@ -85,7 +85,7 @@ jobs:
       - name: Print SAM Template Path and Contents
         run: |
           echo "SAM Template Path: $(pwd)/template.yaml"
-          cat template.yaml
+          cat -A template.yaml
       
       - name: Validate SAM template
         run: sam validate --template-file template.yaml
