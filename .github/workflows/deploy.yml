@@ -25,13 +25,13 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Build Lambda
         run: npm run build
 
       - name: Zip Lambda code
-        run: cd dist && zip -r ../lambda.zip *
+        run: zip -r lambda.zip dist node_modules package.json
 
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v3
