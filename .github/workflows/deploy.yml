@@ -102,6 +102,8 @@ jobs:
           echo "CloudFrontDomain=${{ secrets.CLOUDFRONT_DOMAIN }}"
           echo "RazorpayKeyId=${{ secrets.RAZORPAY_KEY_ID }}"
           echo "RazorpayKeySecret=${{ secrets.RAZORPAY_KEY_SECRET }}"
+          echo "ArtifactBucket=${{ secrets.SAM_ARTIFACT_BUCKET }}"
+          echo "AWSregion=${{ secrets.AWS_REGION }}"
 
       - name: SAM Deploy (Debug)
         run: |
