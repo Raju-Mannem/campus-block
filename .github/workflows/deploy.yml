@@ -71,7 +71,6 @@ jobs:
           sam deploy \
             --stack-name my-express-api \
             --capabilities CAPABILITY_IAM \
-            --s3-bucket ${{ secrets.S3_BUCKET_NAME }}\
             --region ${{ secrets.AWS_REGION }} \
             --parameter-overrides \
               MongoDbUri=${{ secrets.MONGODB_URI }} \
