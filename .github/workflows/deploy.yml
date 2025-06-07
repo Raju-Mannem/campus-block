@@ -78,7 +78,5 @@ jobs:
               S3BucketName=${{ secrets.S3_BUCKET_NAME }} \
               CloudFrontDomain=${{ secrets.CLOUDFRONT_DOMAIN }} \
               RazorpayKeyId=${{ secrets.RAZORPAY_KEY_ID }} \
-              RazorpayKeySecret=${{ secrets.RAZORPAY_KEY_SECRET }} \
-            --no-confirm-changeset \
-            --no-fail-on-empty-changeset
+              RazorpayKeySecret=${{ secrets.RAZORPAY_KEY_SECRET }}
         working-directory: ${{ github.workspace }}
