@@ -15,6 +15,11 @@ Thumbs.db
 .vscode/
 .aws-sam
 samconfig.toml
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+*.tfstate
+*.tfstate.*
 
 server/shared-local-instance.db
 server/dynamodb-local-metadata.json

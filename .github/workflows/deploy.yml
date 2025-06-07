@@ -46,13 +46,9 @@ jobs:
         run: terraform init
         working-directory: terraform
 
-      - name: Import lambda role into Terraform state
-        run: terraform import aws_iam_role.lambda_exec lambda_exec_role
-        working-directory: terraform
-        continue-on-error: true
-
       - name: Terraform Apply
         env:
+          NODE_ENV: production
           AWS_REGION: ${{ secrets.AWS_REGION }}
           TF_VAR_aws_region: ${{ secrets.AWS_REGION }}
           TF_VAR_mongodb_uri: ${{ secrets.MONGODB_URI }}
