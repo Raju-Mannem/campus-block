@@ -48,7 +48,6 @@ jobs:
 
       - name: Terraform Apply
         env:
-          NODE_ENV: production
           AWS_REGION: ${{ secrets.AWS_REGION }}
           TF_VAR_aws_region: ${{ secrets.AWS_REGION }}
           TF_VAR_mongodb_uri: ${{ secrets.MONGODB_URI }}

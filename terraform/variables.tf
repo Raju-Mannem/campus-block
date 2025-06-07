@@ -4,4 +4,3 @@ variable "s3_bucket_name" { type = string }
 variable "cloudfront_domain" { type = string }
 variable "razorpay_key_id" { type = string }
 variable "razorpay_key_secret" { type = string }
-variable "node_env" { type = string }

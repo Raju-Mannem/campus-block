@@ -2,8 +2,12 @@ provider "aws" {
   region = var.aws_region
 }
 
-resource "aws_iam_role" "lambda_exec" {
-  name = "lambda_exec_role"
+resource "random_id" "lambda_role_suffix" {
+  byte_length = 4
+}
+
+resource "aws_iam_role" "lambda_exec_role" {
+  name = "lambda_exec_role_${random_id.lambda_role_suffix.hex}"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
@@ -23,7 +27,8 @@ resource "aws_lambda_function" "main" {
   function_name = "my-lambda"
   handler       = "dist/index.handler"
   runtime       = "nodejs20.x"
-  role          = aws_iam_role.lambda_exec.arn
+  role          = aws_iam_role.lambda_exec_role.arn
+  depends_on       = [aws_iam_role_policy_attachment.lambda_basic_execution]
   filename      = "../lambda.zip"
   source_code_hash = filebase64sha256("../lambda.zip")
   environment {
