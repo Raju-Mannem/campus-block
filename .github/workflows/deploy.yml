@@ -44,6 +44,7 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
+        working-directory: terraform
 
       - name: Terraform Apply
         env:
@@ -55,6 +56,8 @@ jobs:
           TF_VAR_razorpay_key_id: ${{ secrets.RAZORPAY_KEY_ID }}
           TF_VAR_razorpay_key_secret: ${{ secrets.RAZORPAY_KEY_SECRET }}
         run: terraform apply -auto-approve
+        working-directory: terraform
 
       - name: Show API Endpoint
         run: terraform output -raw api_endpoint || terraform output api_endpoint
+        working-directory: terraform
