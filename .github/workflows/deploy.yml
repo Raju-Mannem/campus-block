@@ -40,8 +40,11 @@ jobs:
       - name: Set up AWS SAM CLI
         uses: aws-actions/setup-sam@v2
 
-      - name: Downgrade SAM CLI
-        run: pip install --force-reinstall aws-sam-cli==1.110.0
+      - name: Uninstall existing SAM CLI
+        run: pip uninstall -y aws-sam-cli || true
+
+      - name: Install specific SAM CLI version
+        run: pip install aws-sam-cli==1.110.0
 
       - name: Check SAM CLI Version
         run: sam --version
@@ -98,30 +101,14 @@ jobs:
           file template.yaml
           hexdump -C template.yaml | head -20
 
-      - name: Echo SAM Deploy Params
+      - name: SAM Build and Deploy in Docker
         run: |
-          echo "MongoDbUri=${{ secrets.MONGODB_URI }}"
-          echo "S3BucketName=${{ secrets.S3_BUCKET_NAME }}"
-          echo "CloudFrontDomain=${{ secrets.CLOUDFRONT_DOMAIN }}"
-          echo "RazorpayKeyId=${{ secrets.RAZORPAY_KEY_ID }}"
-          echo "RazorpayKeySecret=${{ secrets.RAZORPAY_KEY_SECRET }}"
-          echo "ArtifactBucket=${{ secrets.SAM_ARTIFACT_BUCKET }}"
-          echo "AWSregion=${{ secrets.AWS_REGION }}"
-
-      - name: SAM Deploy (Debug)
-        run: |
-          sam deploy --debug \
-            --template-file template.yaml \
-            --no-confirm-changeset \
-            --no-fail-on-empty-changeset \
-            --stack-name my-express-api \
-            --capabilities CAPABILITY_IAM \
-            --s3-bucket ${{ secrets.SAM_ARTIFACT_BUCKET }} \
-            --region ${{ secrets.AWS_REGION }} \
-            --parameter-overrides \
-              MongoDbUri=${{ secrets.MONGODB_URI }} \
-              S3BucketName=${{ secrets.S3_BUCKET_NAME }} \
-              CloudFrontDomain=${{ secrets.CLOUDFRONT_DOMAIN }} \
-              RazorpayKeyId=${{ secrets.RAZORPAY_KEY_ID }} \
-              RazorpayKeySecret=${{ secrets.RAZORPAY_KEY_SECRET }}
-        working-directory: ${{ github.workspace }}
+          docker run --rm \
+            -v ${{ github.workspace }}:/app \
+            -w /app \
+            -e AWS_ACCESS_KEY_ID \
+            -e AWS_SECRET_ACCESS_KEY \
+            -e AWS_SESSION_TOKEN \
+            -e AWS_REGION \
+            amazon/aws-sam-cli-build-image-nodejs20.x \
+            bash -c "sam build && sam deploy --template-file template.yaml --stack-name my-express-api --capabilities CAPABILITY_IAM --s3-bucket ${{ secrets.SAM_ARTIFACT_BUCKET }} --region ${{ secrets.AWS_REGION }}"
