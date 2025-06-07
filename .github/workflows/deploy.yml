@@ -38,15 +38,18 @@ jobs:
 
       - name: SAM Build
         run: sam build
+        working-directory: ${{ github.workspace }}
 
       - name: Show built template
         run: cat .aws-sam/build/template.yaml
+        working-directory: ${{ github.workspace }}
 
       - name: Verify AWS Identity
         run: aws sts get-caller-identity
 
       - name: List build directory
         run: ls -l .aws-sam/build
+        working-directory: ${{ github.workspace }}
 
       - name: SAM Deploy (Debug)
         run: |
@@ -62,3 +65,4 @@ jobs:
               CloudFrontDomain=${{ secrets.CLOUDFRONT_DOMAIN }} \
               RazorpayKeyId=${{ secrets.RAZORPAY_KEY_ID }} \
               RazorpayKeySecret=${{ secrets.RAZORPAY_KEY_SECRET }}
+        working-directory: ${{ github.workspace }}
