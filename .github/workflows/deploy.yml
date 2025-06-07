@@ -54,7 +54,6 @@ jobs:
             --capabilities CAPABILITY_IAM \
             --region ${{ secrets.AWS_REGION }} \
             --parameter-overrides \
-              AWSRegion=${{ secrets.AWS_REGION }} \
               MongoDbUri=${{ secrets.MONGODB_URI }} \
               S3BucketName=${{ secrets.S3_BUCKET_NAME }} \
               CloudFrontDomain=${{ secrets.CLOUDFRONT_DOMAIN }} \
