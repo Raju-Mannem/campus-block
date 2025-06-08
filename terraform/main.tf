@@ -25,7 +25,7 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
 
 resource "aws_lambda_function" "main" {
   function_name = "my-lambda"
-  handler       = "dist/index.handler"
+  handler       = "index.handler"
   s3_bucket        = var.lambda_s3_bucket
   s3_key           = "lambda.zip"
   runtime       = "nodejs20.x"
