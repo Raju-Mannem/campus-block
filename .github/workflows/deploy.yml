@@ -75,9 +75,15 @@ jobs:
           lambda_s3_key = "lambda.zip"
           lambda_source_code_hash = "${{ steps.hash.outputs.hash }}"
           EOF
+        working-directory: terraform
 
       - name: Log contents of lambda.auto.tfvars
         run: cat terraform/lambda.auto.tfvars
+        working-directory: terraform
+
+      - name: List files in terraform directory
+        run: ls -l
+        working-directory: terraform
 
       - name: Terraform Plan
         run: terraform plan -input=false
