@@ -62,12 +62,16 @@ jobs:
         env:
           TF_TOKEN_app_terraform_io: ${{ secrets.TFC_TOKEN }}
 
-      - name: Terraform Plan
+      - name: Write Lambda variables file
         run: |
-           terraform plan -input=false \
-             -var="lambda_s3_bucket=${{ secrets.LAMBDA_S3_BUCKET }}" \
-             -var="lambda_s3_key=lambda.zip" \
-             -var="lambda_source_code_hash=${{ steps.hash.outputs.hash }}"
+          cat > terraform/lambda.auto.tfvars <<EOF
+          lambda_s3_bucket = "${{ secrets.LAMBDA_S3_BUCKET }}"
+          lambda_s3_key = "lambda.zip"
+          lambda_source_code_hash = "${{ steps.hash.outputs.hash }}"
+          EOF
+
+      - name: Terraform Plan
+        run: terraform plan -input=false
         working-directory: terraform
         env:
           TF_VAR_aws_region: ${{ secrets.AWS_REGION }}
@@ -79,11 +83,7 @@ jobs:
           TF_TOKEN_app_terraform_io: ${{ secrets.TFC_TOKEN }}
 
       - name: Terraform Apply
-        run: |
-           terraform plan -input=false \
-             -var="lambda_s3_bucket=${{ secrets.LAMBDA_S3_BUCKET }}" \
-             -var="lambda_s3_key=lambda.zip" \
-             -var="lambda_source_code_hash=${{ steps.hash.outputs.hash }}"
+        run: terraform plan -input=false
         working-directory: terraform
         env:
           AWS_REGION: ${{ secrets.AWS_REGION }}
