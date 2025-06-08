@@ -94,9 +94,9 @@ jobs:
         run: ls -l
         working-directory: terraform
 
-    - name: Confirm .auto.tfvars presence before plan
-      run: ls -l && cat lambda.auto.tfvars
-      working-directory: terraform
+      - name: Confirm .auto.tfvars presence before plan
+        run: ls -l && cat lambda.auto.tfvars
+        working-directory: terraform
 
       - name: Terraform Plan
         run: terraform plan -input=false
