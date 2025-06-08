@@ -37,15 +37,24 @@ jobs:
           cd dist
           zip -r ../lambda.zip index.js
           cd ..
-          
-      - name: Install Terraform
-        uses: hashicorp/setup-terraform@v3
+
+      - name: Calculate Lambda zip hash
+        id: hash
+        run: |
+          HASH=$(sha256sum lambda.zip | awk '{print $1}' | xxd -r -p | base64)
+          echo "hash=$HASH" >> $GITHUB_OUTPUT
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github_actions
           aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Upload Lambda zip to S3
+        run: aws s3 cp lambda.zip s3://${{ secrets.LAMBDA_S3_BUCKET }}/lambda.zip
+                    
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init
         run: terraform init
@@ -54,7 +63,10 @@ jobs:
           TF_TOKEN_app_terraform_io: ${{ secrets.TFC_TOKEN }}
 
       - name: Terraform Plan
-        run: terraform plan -input=false
+        run: terraform plan -input=false \
+          -var="lambda_s3_bucket=${{ secrets.LAMBDA_S3_BUCKET }}" \
+          -var="lambda_s3_key=lambda.zip" \
+          -var="lambda_source_code_hash=${{ steps.hash.outputs.hash }}"
         working-directory: terraform
         env:
           TF_VAR_aws_region: ${{ secrets.AWS_REGION }}
@@ -66,7 +78,10 @@ jobs:
           TF_TOKEN_app_terraform_io: ${{ secrets.TFC_TOKEN }}
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve -input=false
+        run: terraform apply -auto-approve -input=false \
+          -var="lambda_s3_bucket=${{ secrets.LAMBDA_S3_BUCKET }}" \
+          -var="lambda_s3_key=lambda.zip" \
+          -var="lambda_source_code_hash=${{ steps.hash.outputs.hash }}
         working-directory: terraform
         env:
           AWS_REGION: ${{ secrets.AWS_REGION }}
