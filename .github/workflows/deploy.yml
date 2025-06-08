@@ -24,6 +24,9 @@ jobs:
       - name: Ensure terraform directory exists
         run: mkdir -p terraform
 
+      - name: List root directory after mkdir
+        run: ls -l
+
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -71,6 +74,9 @@ jobs:
           echo "LAMBDA_S3_KEY: lambda.zip"
           echo "LAMBDA_SOURCE_CODE_HASH: ${{ steps.hash.outputs.hash }}"
 
+      - name: List terraform directory before writing tfvars
+        run: ls -l terraform
+
       - name: Write Lambda variables file
         run: |
           cat > terraform/lambda.auto.tfvars <<EOF
@@ -87,6 +93,10 @@ jobs:
       - name: List files in terraform directory
         run: ls -l
         working-directory: terraform
+
+    - name: Confirm .auto.tfvars presence before plan
+      run: ls -l && cat lambda.auto.tfvars
+      working-directory: terraform
 
       - name: Terraform Plan
         run: terraform plan -input=false
