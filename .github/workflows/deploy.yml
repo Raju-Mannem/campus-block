@@ -79,7 +79,7 @@ jobs:
 
       - name: Write Lambda variables file
         run: |
-          cat > terraform/lambda.auto.tfvars <<EOF
+          cat > lambda.auto.tfvars <<EOF
           lambda_s3_bucket = "${{ secrets.LAMBDA_S3_BUCKET }}"
           lambda_s3_key = "lambda.zip"
           lambda_source_code_hash = "${{ steps.hash.outputs.hash }}"
