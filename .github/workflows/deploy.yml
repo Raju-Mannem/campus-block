@@ -62,14 +62,14 @@ jobs:
         env:
           TF_TOKEN_app_terraform_io: ${{ secrets.TFC_TOKEN }}
 
+      - name: Ensure terraform directory exists
+        run: mkdir -p terraform
+
       - name: Log Lambda zip variables before writing .auto.tfvars
         run: |
           echo "LAMBDA_S3_BUCKET: ${{ secrets.LAMBDA_S3_BUCKET }}"
           echo "LAMBDA_S3_KEY: lambda.zip"
           echo "LAMBDA_SOURCE_CODE_HASH: ${{ steps.hash.outputs.hash }}"
-
-      - name: Ensure terraform directory exists
-        run: mkdir -p terraform
 
       - name: Write Lambda variables file
         run: |
