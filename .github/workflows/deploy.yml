@@ -87,7 +87,7 @@ jobs:
         working-directory: terraform
 
       - name: Log contents of lambda.auto.tfvars
-        run: cat terraform/lambda.auto.tfvars
+        run: cat lambda.auto.tfvars
         working-directory: terraform
 
       - name: List files in terraform directory
