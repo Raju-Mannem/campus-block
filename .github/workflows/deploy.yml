@@ -30,7 +30,7 @@ jobs:
           node-version: 20
 
       - name: Install dependencies and build
-        run: npm install && esbuild src/index.ts --bundle --platform=node --target=node20 --outfile=dist/index.js
+        run: npm install && npm run build
 
       - name: Package Lambda
         run: |
