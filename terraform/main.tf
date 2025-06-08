@@ -19,13 +19,20 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
+data "archive_file" "lambda_zip" {
+  type        = "zip"
+  source_file = "${path.module}/../dist/index.js"
+  output_path = "${path.module}/lambda.zip"
+}
+
+
 resource "aws_lambda_function" "main" {
   function_name = "my-lambda"
   handler       = "index.handler"
   runtime       = "nodejs20.x"
   role          = aws_iam_role.lambda_exec_role.arn
-  filename      = "../lambda.zip"
-  source_code_hash = filebase64sha256("../lambda.zip")
+  filename         = data.archive_file.lambda_zip.output_path
+  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
   memory_size      = 256
   timeout          = 15
   environment {
