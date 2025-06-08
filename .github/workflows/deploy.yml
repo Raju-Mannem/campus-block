@@ -21,14 +21,14 @@ jobs:
       - name: Clean workspace
         run: rm -rf .terraform terraform.tfstate* .terraform.lock.hcl node_modules dist lambda.zip
 
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
       - name: Ensure terraform directory exists
         run: mkdir -p terraform
 
       - name: List root directory after mkdir
         run: ls -l
-
-      - name: Checkout code
-        uses: actions/checkout@v4
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
