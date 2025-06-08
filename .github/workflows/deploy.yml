@@ -63,7 +63,7 @@ jobs:
           TF_VAR_razorpay_key_secret: ${{ secrets.RAZORPAY_KEY_SECRET }}
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve -input=false
+        run: TF_LOG=DEBUG terraform apply -auto-approve -input=false
         working-directory: terraform
         env:
           AWS_REGION: ${{ secrets.AWS_REGION }}
