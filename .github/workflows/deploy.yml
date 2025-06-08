@@ -35,7 +35,7 @@ jobs:
       - name: Package Lambda
         run: |
           cd dist
-          zip -r ../lambda.zip index.js ../node_modules ../package.json
+          zip -r ../lambda.zip index.js ../package.json
           cd ..
           
       - name: Install Terraform
