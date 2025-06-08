@@ -29,6 +29,9 @@ resource "aws_lambda_function" "main" {
   runtime       = "nodejs20.x"
   role          = aws_iam_role.lambda_exec_role.arn
   filename      = "../lambda.zip"
+  source_code_hash = filebase64sha256("../lambda.zip")
+  memory_size      = 256
+  timeout          = 15
   environment {
     variables = {
       MONGODB_URI         = var.mongodb_uri
@@ -38,6 +41,10 @@ resource "aws_lambda_function" "main" {
       RAZORPAY_KEY_SECRET = var.razorpay_key_secret
       NODE_ENV            = "production"
     }
+  }
+  tags = {
+    Environment = "production"
+    Project     = "my-api"
   }
 }
 
