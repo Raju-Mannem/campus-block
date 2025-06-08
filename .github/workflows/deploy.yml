@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - name: Clean workspace
-        run: rm -rf .terraform terraform.tfstate* .terraform.lock.hcl .aws-sam node_modules dist lambda.zip
+        run: rm -rf .terraform terraform.tfstate* .terraform.lock.hcl node_modules dist lambda.zip
 
       - name: Checkout code
         uses: actions/checkout@v4
@@ -47,9 +47,6 @@ jobs:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github_actions
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Upload Lambda zip to S3
-        run: aws s3 cp lambda.zip s3://${{ secrets.LAMBDA_S3_BUCKET }}/lambda.zip
-
       - name: Terraform Init
         run: terraform init
         working-directory: terraform
@@ -64,7 +61,6 @@ jobs:
           TF_VAR_cloudfront_domain: ${{ secrets.CLOUDFRONT_DOMAIN }}
           TF_VAR_razorpay_key_id: ${{ secrets.RAZORPAY_KEY_ID }}
           TF_VAR_razorpay_key_secret: ${{ secrets.RAZORPAY_KEY_SECRET }}
-          TF_VAR_lambda_s3_bucket: ${{ secrets.LAMBDA_S3_BUCKET }}
 
       - name: Terraform Apply
         run: terraform apply -auto-approve -input=false
@@ -77,7 +73,6 @@ jobs:
           TF_VAR_cloudfront_domain: ${{ secrets.CLOUDFRONT_DOMAIN }}
           TF_VAR_razorpay_key_id: ${{ secrets.RAZORPAY_KEY_ID }}
           TF_VAR_razorpay_key_secret: ${{ secrets.RAZORPAY_KEY_SECRET }}
-          TF_VAR_lambda_s3_bucket: ${{ secrets.LAMBDA_S3_BUCKET }}
 
       - name: Show API Endpoint
         run: terraform output -raw api_endpoint || terraform output api_endpoint
