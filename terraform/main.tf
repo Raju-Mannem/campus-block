@@ -67,6 +67,7 @@ resource "aws_apigatewayv2_stage" "api" {
   api_id      = aws_apigatewayv2_api.api.id
   name        = "$default"
   auto_deploy = true
+  depends_on  = [aws_apigatewayv2_route.proxy]
 }
 
 resource "aws_lambda_permission" "apigw" {
