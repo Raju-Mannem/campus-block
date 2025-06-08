@@ -2,12 +2,8 @@ provider "aws" {
   region = var.aws_region
 }
 
-resource "random_id" "lambda_role_suffix" {
-  byte_length = 4
-}
-
 resource "aws_iam_role" "lambda_exec_role" {
-  name = "lambda_exec_role_${random_id.lambda_role_suffix.hex}"
+  name = "lambda_exec_role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
@@ -42,14 +38,10 @@ resource "aws_lambda_function" "main" {
       NODE_ENV            = "production"
     }
   }
-  tags = {
-    Environment = "production"
-    Project     = "my-api"
-  }
 }
 
 resource "aws_apigatewayv2_api" "api" {
-  name          = "my-api"
+  name          = "campus-block-api"
   protocol_type = "HTTP"
 }
 
