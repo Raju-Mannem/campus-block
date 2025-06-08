@@ -68,6 +68,9 @@ jobs:
           echo "LAMBDA_S3_KEY: lambda.zip"
           echo "LAMBDA_SOURCE_CODE_HASH: ${{ steps.hash.outputs.hash }}"
 
+      - name: Ensure terraform directory exists
+        run: mkdir -p terraform
+
       - name: Write Lambda variables file
         run: |
           cat > terraform/lambda.auto.tfvars <<EOF
