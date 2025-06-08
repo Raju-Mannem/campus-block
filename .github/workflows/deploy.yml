@@ -50,6 +50,8 @@ jobs:
       - name: Terraform Init
         run: terraform init
         working-directory: terraform
+        env:
+          TF_TOKEN_app_terraform_io: ${{ secrets.TFC_TOKEN }}
 
       - name: Terraform Plan
         run: terraform plan -input=false
@@ -61,9 +63,10 @@ jobs:
           TF_VAR_cloudfront_domain: ${{ secrets.CLOUDFRONT_DOMAIN }}
           TF_VAR_razorpay_key_id: ${{ secrets.RAZORPAY_KEY_ID }}
           TF_VAR_razorpay_key_secret: ${{ secrets.RAZORPAY_KEY_SECRET }}
+          TF_TOKEN_app_terraform_io: ${{ secrets.TFC_TOKEN }}
 
       - name: Terraform Apply
-        run: TF_LOG=DEBUG terraform apply -auto-approve -input=false
+        run: terraform apply -auto-approve -input=false
         working-directory: terraform
         env:
           AWS_REGION: ${{ secrets.AWS_REGION }}
@@ -73,6 +76,7 @@ jobs:
           TF_VAR_cloudfront_domain: ${{ secrets.CLOUDFRONT_DOMAIN }}
           TF_VAR_razorpay_key_id: ${{ secrets.RAZORPAY_KEY_ID }}
           TF_VAR_razorpay_key_secret: ${{ secrets.RAZORPAY_KEY_SECRET }}
+          TF_TOKEN_app_terraform_io: ${{ secrets.TFC_TOKEN }}
 
       - name: Show API Endpoint
         run: terraform output -raw api_endpoint || terraform output api_endpoint
