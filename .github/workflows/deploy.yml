@@ -30,12 +30,12 @@ jobs:
           node-version: 20
 
       - name: Install dependencies and build
-        run: npm ci --only=production && npx esbuild src/index.ts --bundle --platform=node --target=node20 --outfile=dist/index.js
+        run: npm install && esbuild src/index.ts --bundle --platform=node --target=node20 --outfile=dist/index.js
 
       - name: Package Lambda
         run: |
           cd dist
-          zip -r ../lambda.zip index.js ../package.json
+          zip -r ../lambda.zip index.js
           cd ..
           
       - name: Install Terraform
