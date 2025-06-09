@@ -58,7 +58,6 @@ jobs:
         id: upload
         run: |
           S3_KEY="lambda-builds/lambda-${{ github.sha }}.zip"
-          aws s3 cp lambda.zip s3://${{ secrets.LAMBDA_S3_BUCKET }}/$S3_KEY
           echo "LAMBDA_S3_KEY=$S3_KEY" >> $GITHUB_ENV
           aws s3 cp lambda.zip s3://${{ secrets.LAMBDA_S3_BUCKET }}/$S3_KEY
 
