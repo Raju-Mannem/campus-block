@@ -78,21 +78,6 @@ jobs:
           TF_VAR_razorpay_key_secret: ${{ secrets.RAZORPAY_KEY_SECRET }}
           TF_TOKEN_app_terraform_io: ${{ secrets.TFC_TOKEN }}
 
-      - name: Terraform Apply
-        run: terraform apply -auto-approve -input=false
-        working-directory: terraform
-        env:
-          TF_VAR_aws_region: ${{ secrets.AWS_REGION }}
-          TF_VAR_lambda_s3_bucket: ${{ secrets.LAMBDA_S3_BUCKET }}
-          TF_VAR_lambda_s3_key: ${{ env.LAMBDA_S3_KEY }}
-          TF_VAR_lambda_source_code_hash: ${{ steps.hash.outputs.hash }}
-          TF_VAR_mongodb_uri: ${{ secrets.MONGODB_URI }}
-          TF_VAR_s3_bucket_name: ${{ secrets.S3_BUCKET_NAME }}
-          TF_VAR_cloudfront_domain: ${{ secrets.CLOUDFRONT_DOMAIN }}
-          TF_VAR_razorpay_key_id: ${{ secrets.RAZORPAY_KEY_ID }}
-          TF_VAR_razorpay_key_secret: ${{ secrets.RAZORPAY_KEY_SECRET }}
-          TF_TOKEN_app_terraform_io: ${{ secrets.TFC_TOKEN }}
-
       - name: Output API Endpoint
         run: terraform output api_endpoint
         working-directory: terraform
