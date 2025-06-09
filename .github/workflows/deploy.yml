@@ -17,6 +17,8 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      TF_TOKEN_app_terraform_io: ${{ secrets.TFC_TOKEN }}
 
     steps:
       - name: Checkout Code
@@ -76,7 +78,6 @@ jobs:
           TF_VAR_cloudfront_domain: ${{ secrets.CLOUDFRONT_DOMAIN }}
           TF_VAR_razorpay_key_id: ${{ secrets.RAZORPAY_KEY_ID }}
           TF_VAR_razorpay_key_secret: ${{ secrets.RAZORPAY_KEY_SECRET }}
-          TF_TOKEN_app_terraform_io: ${{ secrets.TFC_TOKEN }}
 
       - name: Output API Endpoint
         run: terraform output api_endpoint
