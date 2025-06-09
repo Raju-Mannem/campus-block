@@ -81,7 +81,3 @@ resource "aws_lambda_permission" "apigw" {
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_api.api.execution_arn}/*/*"
 }
-
-output "api_endpoint" {
-  value = aws_apigatewayv2_api.api.api_endpoint
-}
