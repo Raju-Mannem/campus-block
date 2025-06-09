@@ -3,8 +3,12 @@ name: Deploy Serverless App with Terraform
 on:
   push:
     branches: [master]
-    paths: [src/**, package.json, package-lock.json, terraform/**]
-    workflow_dispatch:
+    paths:
+      - "src/**"
+      - "package.json"
+      - "package-lock.json"
+      - "terraform/**"
+  workflow_dispatch:
 
 permissions:
   id-token: write
@@ -13,53 +17,44 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: .
 
     steps:
-      - name: Clean workspace
-        run: rm -rf .terraform terraform.tfstate* .terraform.lock.hcl node_modules dist lambda.zip
-
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v4
-      
-      - name: Ensure terraform directory exists
-        run: mkdir -p terraform
 
-      - name: List root directory after mkdir
-        run: ls -l
-
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Install dependencies and build
-        run: npm install && npm run build
-
-      - name: Package Lambda
+      - name: Install Dependencies & Build
         run: |
-          cd dist
-          zip -r ../lambda.zip index.js
-          cd ..
+          npm install
+          npm run build  # assumes esbuild bundles to dist/index.js
 
-      - name: Calculate Lambda zip hash
+      - name: Package Lambda Function
+        run: |
+          zip -r lambda.zip dist/index.js
+
+      - name: Generate SHA Hash
         id: hash
         run: |
           HASH=$(sha256sum lambda.zip | awk '{print $1}' | xxd -r -p | base64)
           echo "hash=$HASH" >> $GITHUB_OUTPUT
 
-      - name: Configure AWS credentials
+      - name: Configure AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github_actions
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Upload Lambda zip to S3
-        run: aws s3 cp lambda.zip s3://${{ secrets.LAMBDA_S3_BUCKET }}/lambda.zip
-                    
-      - name: Install Terraform
+      - name: Upload Lambda Artifact to S3
+        run: |
+          S3_KEY="lambda-builds/lambda-${{ github.sha }}.zip"
+          aws s3 cp lambda.zip s3://${{ secrets.LAMBDA_S3_BUCKET }}/$S3_KEY
+          echo "LAMBDA_S3_KEY=$S3_KEY" >> $GITHUB_ENV
+
+      - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init
@@ -68,41 +63,14 @@ jobs:
         env:
           TF_TOKEN_app_terraform_io: ${{ secrets.TFC_TOKEN }}
 
-      - name: Log Lambda zip variables before writing .auto.tfvars
-        run: |
-          echo "LAMBDA_S3_BUCKET: ${{ secrets.LAMBDA_S3_BUCKET }}"
-          echo "LAMBDA_S3_KEY: lambda.zip"
-          echo "LAMBDA_SOURCE_CODE_HASH: ${{ steps.hash.outputs.hash }}"
-
-      - name: List terraform directory before writing tfvars
-        run: ls -l terraform
-
-      - name: Write Lambda variables file
-        run: |
-          cat > lambda.auto.tfvars <<EOF
-          lambda_s3_bucket = "${{ secrets.LAMBDA_S3_BUCKET }}"
-          lambda_s3_key = "lambda.zip"
-          lambda_source_code_hash = "${{ steps.hash.outputs.hash }}"
-          EOF
-        working-directory: terraform
-
-      - name: Log contents of lambda.auto.tfvars
-        run: cat lambda.auto.tfvars
-        working-directory: terraform
-
-      - name: List files in terraform directory
-        run: ls -l
-        working-directory: terraform
-
-      - name: Confirm .auto.tfvars presence before plan
-        run: ls -l && cat lambda.auto.tfvars
-        working-directory: terraform
-
       - name: Terraform Plan
         run: terraform plan -input=false
         working-directory: terraform
         env:
           TF_VAR_aws_region: ${{ secrets.AWS_REGION }}
+          TF_VAR_lambda_s3_bucket: ${{ secrets.LAMBDA_S3_BUCKET }}
+          TF_VAR_lambda_s3_key: ${{ env.LAMBDA_S3_KEY }}
+          TF_VAR_lambda_source_code_hash: ${{ steps.hash.outputs.hash }}
           TF_VAR_mongodb_uri: ${{ secrets.MONGODB_URI }}
           TF_VAR_s3_bucket_name: ${{ secrets.S3_BUCKET_NAME }}
           TF_VAR_cloudfront_domain: ${{ secrets.CLOUDFRONT_DOMAIN }}
@@ -111,11 +79,13 @@ jobs:
           TF_TOKEN_app_terraform_io: ${{ secrets.TFC_TOKEN }}
 
       - name: Terraform Apply
-        run: terraform plan -input=false
+        run: terraform apply -auto-approve -input=false
         working-directory: terraform
         env:
-          AWS_REGION: ${{ secrets.AWS_REGION }}
           TF_VAR_aws_region: ${{ secrets.AWS_REGION }}
+          TF_VAR_lambda_s3_bucket: ${{ secrets.LAMBDA_S3_BUCKET }}
+          TF_VAR_lambda_s3_key: ${{ env.LAMBDA_S3_KEY }}
+          TF_VAR_lambda_source_code_hash: ${{ steps.hash.outputs.hash }}
           TF_VAR_mongodb_uri: ${{ secrets.MONGODB_URI }}
           TF_VAR_s3_bucket_name: ${{ secrets.S3_BUCKET_NAME }}
           TF_VAR_cloudfront_domain: ${{ secrets.CLOUDFRONT_DOMAIN }}
@@ -123,6 +93,6 @@ jobs:
           TF_VAR_razorpay_key_secret: ${{ secrets.RAZORPAY_KEY_SECRET }}
           TF_TOKEN_app_terraform_io: ${{ secrets.TFC_TOKEN }}
 
-      - name: Show API Endpoint
-        run: terraform output -raw api_endpoint || terraform output api_endpoint
+      - name: Output API Endpoint
+        run: terraform output api_endpoint
         working-directory: terraform

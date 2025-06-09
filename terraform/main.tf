@@ -2,13 +2,22 @@ provider "aws" {
   region = var.aws_region
 }
 
+terraform {
+  backend "remote" {
+    organization = "your-org"
+    workspaces {
+      name = "lambda-api-deploy"
+    }
+  }
+}
+
 resource "aws_iam_role" "lambda_exec_role" {
   name = "lambda_exec_role"
   assume_role_policy = jsonencode({
-    Version = "2012-10-17"
+    Version = "2012-10-17",
     Statement = [{
-      Action = "sts:AssumeRole"
-      Effect = "Allow"
+      Action = "sts:AssumeRole",
+      Effect = "Allow",
       Principal = { Service = "lambda.amazonaws.com" }
     }]
   })
@@ -24,10 +33,14 @@ resource "aws_lambda_function" "main" {
   handler       = "index.handler"
   runtime       = "nodejs20.x"
   role          = aws_iam_role.lambda_exec_role.arn
-  s3_bucket        = var.lambda_s3_bucket
+
+  s3_bucket     = var.lambda_s3_bucket
+  s3_key        = var.lambda_s3_key
   source_code_hash = var.lambda_source_code_hash
-  memory_size      = 256
-  timeout          = 15
+
+  memory_size = 256
+  timeout     = 15
+
   environment {
     variables = {
       MONGODB_URI         = var.mongodb_uri
@@ -43,6 +56,10 @@ resource "aws_lambda_function" "main" {
 resource "aws_apigatewayv2_api" "api" {
   name          = "campus-block-api"
   protocol_type = "HTTP"
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "aws_apigatewayv2_integration" "lambda" {
@@ -59,7 +76,7 @@ resource "aws_apigatewayv2_route" "proxy" {
   target    = "integrations/${aws_apigatewayv2_integration.lambda.id}"
 }
 
-resource "aws_apigatewayv2_stage" "api" {
+resource "aws_apigatewayv2_stage" "default" {
   api_id      = aws_apigatewayv2_api.api.id
   name        = "$default"
   auto_deploy = true
@@ -69,7 +86,11 @@ resource "aws_apigatewayv2_stage" "api" {
 resource "aws_lambda_permission" "apigw" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.main.function_name
+  function_name = aws_lambda_function.main.arn
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_api.api.execution_arn}/*/*"
+}
+
+output "api_endpoint" {
+  value = aws_apigatewayv2_api.api.api_endpoint
 }

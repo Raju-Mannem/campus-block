@@ -1,9 +1,9 @@
 variable "aws_region" { type = string }
+variable "lambda_s3_bucket" { type = string }
+variable "lambda_s3_key" { type = string }
+variable "lambda_source_code_hash" { type = string }
 variable "mongodb_uri" { type = string }
 variable "s3_bucket_name" { type = string }
 variable "cloudfront_domain" { type = string }
 variable "razorpay_key_id" { type = string }
 variable "razorpay_key_secret" { type = string }
-variable "lambda_s3_bucket" { type = string }
-variable "lambda_s3_key" { type = string }
-variable "lambda_source_code_hash" { type = string }
