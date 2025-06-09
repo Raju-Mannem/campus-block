@@ -21,6 +21,10 @@ jobs:
       TF_TOKEN_app_terraform_io: ${{ secrets.TFC_TOKEN }}
 
     steps:
+      - name: Clean up local Terraform state and build artifacts
+        run: |
+          rm -rf .terraform .terraform.lock.hcl terraform.tfstate terraform.tfstate.backup lambda.zip dist
+
       - name: Checkout Code
         uses: actions/checkout@v4
 
