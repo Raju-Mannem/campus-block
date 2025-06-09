@@ -2,15 +2,6 @@ provider "aws" {
   region = var.aws_region
 }
 
-terraform {
-  backend "remote" {
-    organization = "your-org"
-    workspaces {
-      name = "lambda-api-deploy"
-    }
-  }
-}
-
 resource "aws_iam_role" "lambda_exec_role" {
   name = "lambda_exec_role"
   assume_role_policy = jsonencode({
