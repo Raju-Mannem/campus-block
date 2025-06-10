@@ -36,11 +36,12 @@ jobs:
       - name: Install Dependencies & Build
         run: |
           npm install
-          npm run build  # assumes esbuild bundles to dist/index.js
+          npm run build
 
       - name: Package Lambda Function
         run: |
-          zip -r lambda.zip dist/index.js
+          cd dist
+          zip -r ../lambda.zip index.js
 
       - name: Generate SHA Hash
         id: hash
